@@ -4,12 +4,36 @@ import Order from "./Order";
 import MenuAdmin from "./MenuAdmin";
 import sampleBurgers from "../sample-burgers";
 import Burger from "./Burger";
+import base from "../base";
 
 class App extends React.Component {
   state = {
     burgers: {},
     order: {},
   };
+
+  componentDidMount() {
+    const { params } = this.props.match;
+    const localStorageRef = localStorage.getItem(params.restaurantId);
+
+    if (localStorageRef) {
+      this.setState({ order: JSON.parse(localStorageRef) });
+    }
+
+    this.ref = base.syncState(`${params.restaurantId}/burgers`, {
+      context: this,
+      state: "burgers",
+    });
+  }
+
+  componentDidUpdate() {
+    const { params } = this.props.match;
+    localStorage.setItem(params.restaurantId, JSON.stringify(this.state.order));
+  }
+
+  componentWillUnmount() {
+    base.removeBinding(this.ref);
+  }
 
   addBurger = (burger) => {
     // 1. Делаем копию объекта state
@@ -18,6 +42,15 @@ class App extends React.Component {
     burgers[`burger${Date.now()}`] = burger;
     // 3. записать новый бургер в объект state
     this.setState({ burgers: burgers });
+  };
+
+  updateBurger = (key, updatedBurger) =>{
+    // 1. Делаем копию объекта state
+    const burgers = { ...this.state.burgers };
+    // 2.Обновляем нужный бургер
+    burgers[key] = updatedBurger;
+    // 3. записать новый бургер в объект state
+    this.setState({ burgers });
   };
 
   loadSampleBurgers = () => {
@@ -51,10 +84,12 @@ class App extends React.Component {
             })}
           </ul>
         </div>
-        <Order />
+        <Order burgers={this.state.burgers} order={this.state.order} />
         <MenuAdmin
           addBurger={this.addBurger}
           loadSampleBurgers={this.loadSampleBurgers}
+          burgers={this.state.burgers}
+          updateBurger = {this.updateBurger}
         />
       </div>
     );
