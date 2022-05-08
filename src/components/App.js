@@ -53,9 +53,20 @@ class App extends React.Component {
     this.setState({ burgers });
   };
 
+   deliteBurger = (key) => {
+     // 1. Делаем копию объекта state
+     const burgers = { ...this.state.burgers };
+     // 2., удаляем бургер
+     burgers[key] = null;
+     // 3. записать новый бургер в объект state
+     this.setState({ burgers });
+   }
+
   loadSampleBurgers = () => {
     this.setState({ burgers: sampleBurgers });
   };
+
+  
 
   addToOrder = (key) => {
     //1. Делаем копию объекта state
