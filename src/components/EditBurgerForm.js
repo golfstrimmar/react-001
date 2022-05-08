@@ -1,11 +1,27 @@
 import React from "react";
+import propTypes from "prop-types";
 
 class EditBurgerForm extends React.Component {
-  handleChange = event => {
-    
+  static propTypes = {
+    details: propTypes.shape({
+      image: propTypes.string,
+      name: propTypes.string,
+      price: propTypes.number,
+      desc: propTypes.string,
+      status: propTypes.string,
+    }),
+    index: propTypes.string,
+    updateBurger: propTypes.func,
+    deliteBurger: propTypes.func,
+  };
+
+  handleChange = (event) => {
     const updatedBurger = {
       ...this.props.burger,
-      [event.currentTarget.name]: event.currentTarget.value
+      [event.currentTarget.name]:
+        event.currentTarget.name === "price"
+          ? parseFloat(event.currentTarget.value) || 0
+          : event.currentTarget.value,
     };
 
     this.props.updateBurger(this.props.index, updatedBurger);
@@ -46,11 +62,12 @@ class EditBurgerForm extends React.Component {
           type="text"
           value={this.props.burger.image}
         ></input>
+        <button onClick={() => this.props.deliteBurger(this.props.index)}>
+          удалить из меню
+        </button>
       </div>
     );
   }
 }
 
 export default EditBurgerForm;
-
-
